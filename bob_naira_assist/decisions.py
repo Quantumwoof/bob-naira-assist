@@ -30,8 +30,10 @@ def evaluate_buffer(
 
     Priority:
     1. Cash shortfall vs upcoming bills → ping_shortfall
-    2. Adverse FX move ≥ FX_WATCH_PCT → ping_fx_watch (+ wait/send suggestion)
-    3. Otherwise quiet (optionally send-now if mild favorable / stable FX)
+    2. Adverse FX ≥ FX_WAIT_PCT + remittance planned → suggest_wait
+       else adverse FX ≥ FX_WATCH_PCT → ping_fx_watch
+    3. Remittance planned + FX stable (pct ≤ 0.5) → suggest_send_now
+    4. Otherwise quiet (buffer covers bills; no remittance / FX within band)
     """
     bills_total = total_due(bills)
     shortfall = max(0.0, bills_total - buffer.balance_ngn)

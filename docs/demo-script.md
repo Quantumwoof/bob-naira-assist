@@ -19,16 +19,20 @@ USD→NGN remittance timing. Noise is costly; an agent should stay **quiet** whe
 
 ## Minute 1:00 — CLI story
 
-Run `python -m bob_naira_assist`. Point to:
+Run `python -m bob_naira_assist`. Point to the three judge beats:
 
-1. **Quiet / healthy** — buffer covers bills, stable FX.
-2. **Alert / shortfall** — buffer too low → `ping_shortfall`.
-3. **FX wait** — buffer OK but spiked FX → suggest wait before sending USD.
+1. **Quiet** — buffer covers bills, stable FX, **no** remittance planned → `quiet`
+2. **Shortfall ping** — buffer too low → `ping_shortfall`
+3. **FX wait** — buffer OK but spiked FX + remittance planned → `suggest_wait`
+
+Optional (Playground / UI button): **Send now** — healthy buffer + stable FX + remittance → `suggest_send_now`.
 
 ## Minute 2:00 — Streamlit
 
-Open **Judge demo** tab → click the three buttons. Optionally use **Playground** to move
-the NGN buffer slider and toggle mock FX.
+Open **Judge demo** tab → click **1 · Quiet**, **2 · Shortfall ping**, **3 · FX wait**.
+Optionally **Optional · Send now** or use **Playground** (buffer slider, FX `stable` / `watch` / `spike`).
+
+Banner confirms **DEMO_MODE is ON**.
 
 ## Minute 2:30 — Bob as core component
 
@@ -40,3 +44,4 @@ Open `AGENTS.md` + `docs/bob-workflow.md`. Explain planned Bob sessions and that
 
 - Team page: https://lablab.ai/ai-hackathons/ibm-bob-2-hackathon/bobnairaassist
 - Builder: Joshua Jubelo · Quantumwoof · Independent
+- Checklist: `docs/submission-checklist.md`

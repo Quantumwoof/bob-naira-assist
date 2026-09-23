@@ -15,13 +15,15 @@ flowchart LR
 
   subgraph core [bob_naira_assist]
     Eval[evaluate_buffer]
-    Agent[agent demo script]
+    Agent[agent demo scenarios]
   end
 
   subgraph outs [Outputs]
-    Quiet[Quiet]
-    Ping[Ping shortfall / FX]
-    Timing[Wait vs send now]
+    Quiet[quiet]
+    Shortfall[ping_shortfall]
+    FxWatch[ping_fx_watch]
+    Wait[suggest_wait]
+    Send[suggest_send_now]
     UI[Streamlit app.py]
     CLI[python -m bob_naira_assist]
   end
@@ -30,8 +32,10 @@ flowchart LR
   Buffer --> Eval
   FX --> Eval
   Eval --> Quiet
-  Eval --> Ping
-  Eval --> Timing
+  Eval --> Shortfall
+  Eval --> FxWatch
+  Eval --> Wait
+  Eval --> Send
   Agent --> CLI
   Eval --> UI
   Agent --> UI
@@ -40,15 +44,32 @@ flowchart LR
   Bob -.->|exports| Sessions[bob_sessions/]
 ```
 
+## Decision priority (`decisions.py`)
+
+1. Cash shortfall vs bills → `ping_shortfall`
+2. Adverse FX ≥ 3% + remittance planned → `suggest_wait`; else adverse FX ≥ 2% → `ping_fx_watch`
+3. Remittance planned + FX stable (pct ≤ 0.5) → `suggest_send_now`
+4. Else → `quiet`
+
+## Demo scenarios (`agent.py`)
+
+| Beat | Function | Expected action |
+|------|----------|-----------------|
+| Judge 1 | `run_quiet_scenario` | `quiet` (no remittance) |
+| Judge 2 | `run_alert_scenario` | `ping_shortfall` |
+| Judge 3 | `run_fx_wait_scenario` | `suggest_wait` |
+| Optional | `run_send_now_scenario` | `suggest_send_now` |
+
 ## Modules
 
 | Module | Role |
 |--------|------|
 | `models.py` | Bills, buffer, FX quote, `AgentDecision` |
-| `bills.py` | Deterministic sample Nigerian bills |
-| `fx.py` | Mock stable / spike USD/NGN quotes |
+| `bills.py` | Deterministic sample Nigerian bills (total ₦327,500) |
+| `fx.py` | Mock `stable` / `watch` (~2.5%) / `spike` (5%) quotes |
 | `decisions.py` | Pure quiet-vs-ping + remittance timing |
 | `agent.py` | DEMO_MODE scripted scenarios |
+| `demo.py` | Thin `python -m bob_naira_assist.demo` alias |
 | `app.py` | Streamlit judge path |
 
 ## Non-goals (MVP)

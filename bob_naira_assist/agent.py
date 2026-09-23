@@ -15,65 +15,67 @@ def demo_mode_enabled() -> bool:
     return os.environ.get("DEMO_MODE", "1").strip() not in {"0", "false", "False", "no"}
 
 
+def _scenario_lines(title: str, buffer: CashBuffer, decision: AgentDecision, bills) -> List[str]:
+    return [
+        f"=== BobNairaAssist DEMO — {title} ===",
+        "Bills:",
+        *[format_bill_line(b) for b in bills],
+        f"Buffer: ₦{buffer.balance_ngn:,.0f}",
+        f"Decision: {decision.action.value}",
+        f"Message: {decision.message}",
+    ]
+
+
 def run_quiet_scenario() -> Tuple[List[str], AgentDecision]:
-    """Healthy buffer + stable FX → quiet (or mild send-now)."""
+    """True quiet: buffer covers bills, stable FX, no remittance planned → quiet."""
     bills = sample_bills()
     buffer = CashBuffer(balance_ngn=400_000.0)
     fx = mock_quote("stable")
-    decision = evaluate_buffer(bills, buffer, fx, remittance_planned_usd=200.0)
-    lines = [
-        "=== BobNairaAssist DEMO — quiet / healthy run ===",
-        "Bills:",
-        *[format_bill_line(b) for b in bills],
-        f"Buffer: ₦{buffer.balance_ngn:,.0f}",
-        f"Decision: {decision.action.value}",
-        f"Message: {decision.message}",
-    ]
-    return lines, decision
+    decision = evaluate_buffer(bills, buffer, fx, remittance_planned_usd=None)
+    return _scenario_lines("quiet (no remittance)", buffer, decision, bills), decision
 
 
 def run_alert_scenario() -> Tuple[List[str], AgentDecision]:
-    """Tight buffer + FX spike → shortfall or FX wait ping."""
+    """Tight buffer → ping_shortfall (FX irrelevant once shortfall wins)."""
     bills = sample_bills()
-    buffer = CashBuffer(balance_ngn=280_000.0)  # shortfall vs ~327.5k bills
+    buffer = CashBuffer(balance_ngn=280_000.0)  # shortfall vs ₦327,500 bills
     fx = mock_quote("spike")
     decision = evaluate_buffer(bills, buffer, fx, remittance_planned_usd=500.0)
-    lines = [
-        "=== BobNairaAssist DEMO — alert / shortfall run ===",
-        "Bills:",
-        *[format_bill_line(b) for b in bills],
-        f"Buffer: ₦{buffer.balance_ngn:,.0f}",
-        f"Decision: {decision.action.value}",
-        f"Message: {decision.message}",
-    ]
-    return lines, decision
+    return _scenario_lines("shortfall ping", buffer, decision, bills), decision
 
 
-def run_fx_watch_scenario() -> Tuple[List[str], AgentDecision]:
-    """Buffer OK but FX spiked → wait / FX watch."""
+def run_fx_wait_scenario() -> Tuple[List[str], AgentDecision]:
+    """Buffer OK but FX spiked (≥3%) with remittance planned → suggest_wait."""
     bills = sample_bills()
     buffer = CashBuffer(balance_ngn=500_000.0)
     fx = mock_quote("spike")
     decision = evaluate_buffer(bills, buffer, fx, remittance_planned_usd=500.0)
-    lines = [
-        "=== BobNairaAssist DEMO — FX watch / wait run ===",
-        "Bills:",
-        *[format_bill_line(b) for b in bills],
-        f"Buffer: ₦{buffer.balance_ngn:,.0f}",
-        f"Decision: {decision.action.value}",
-        f"Message: {decision.message}",
-    ]
-    return lines, decision
+    return _scenario_lines("FX wait", buffer, decision, bills), decision
+
+
+# Back-compat alias used by older docs/imports.
+run_fx_watch_scenario = run_fx_wait_scenario
+
+
+def run_send_now_scenario() -> Tuple[List[str], AgentDecision]:
+    """Optional 4th beat: buffer OK + stable FX + remittance planned → suggest_send_now."""
+    bills = sample_bills()
+    buffer = CashBuffer(balance_ngn=400_000.0)
+    fx = mock_quote("stable")
+    decision = evaluate_buffer(bills, buffer, fx, remittance_planned_usd=200.0)
+    return _scenario_lines("send now (optional)", buffer, decision, bills), decision
 
 
 def run_demo_script() -> str:
-    """Print quiet + alert story for CLI judges (deterministic)."""
+    """Judge CLI story: quiet → shortfall → FX wait (send-now is optional/playground)."""
     chunks: List[str] = []
-    for runner in (run_quiet_scenario, run_alert_scenario, run_fx_watch_scenario):
+    for runner in (run_quiet_scenario, run_alert_scenario, run_fx_wait_scenario):
         lines, _ = runner()
         chunks.append("\n".join(lines))
     footer = (
         "\n---\n"
+        "Judge beats: quiet → shortfall ping → FX wait.\n"
+        "Optional send-now: playground / run_send_now_scenario (not part of the three-beat story).\n"
         "DEMO_MODE=1: no IBM/watsonx credentials required.\n"
         "IBM Bob IDE is the planned core build partner (see AGENTS.md, bob_sessions/)."
     )

@@ -1,4 +1,4 @@
-"""CLI entry: python -m bob_naira_assist"""
+"""CLI entry: python -m bob_naira_assist  |  bob-naira-assist"""
 
 from __future__ import annotations
 

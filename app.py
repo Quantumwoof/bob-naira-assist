@@ -8,13 +8,14 @@ import streamlit as st
 
 from bob_naira_assist.agent import (
     run_alert_scenario,
-    run_fx_watch_scenario,
+    run_fx_wait_scenario,
     run_quiet_scenario,
+    run_send_now_scenario,
 )
-from bob_naira_assist.bills import format_bill_line, sample_bills
+from bob_naira_assist.bills import format_bill_line, sample_bills, total_due
 from bob_naira_assist.decisions import evaluate_buffer
 from bob_naira_assist.fx import mock_quote
-from bob_naira_assist.models import CashBuffer
+from bob_naira_assist.models import ActionKind, AgentDecision, CashBuffer
 
 os.environ.setdefault("DEMO_MODE", "1")
 
@@ -24,10 +25,51 @@ st.set_page_config(
     layout="centered",
 )
 
+ACTION_STYLE = {
+    ActionKind.QUIET: ("success", "🟢"),
+    ActionKind.PING_SHORTFALL: ("error", "🔴"),
+    ActionKind.PING_FX_WATCH: ("warning", "🟡"),
+    ActionKind.SUGGEST_WAIT: ("warning", "🟠"),
+    ActionKind.SUGGEST_SEND_NOW: ("info", "🔵"),
+}
+
+
+def fmt_ngn(amount: float) -> str:
+    return f"₦{amount:,.0f}"
+
+
+def render_decision(decision: AgentDecision, lines: list[str] | None = None) -> None:
+    kind, emoji = ACTION_STYLE.get(decision.action, ("info", "⚪"))
+    badge = f"{emoji} `{decision.action.value}`"
+    if kind == "success":
+        st.success(badge)
+    elif kind == "error":
+        st.error(badge)
+    elif kind == "warning":
+        st.warning(badge)
+    else:
+        st.info(badge)
+
+    st.write(decision.message)
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Buffer", fmt_ngn(decision.buffer_ngn))
+    m2.metric("Bills total", fmt_ngn(decision.bills_total_ngn))
+    shortfall_label = fmt_ngn(decision.shortfall_ngn) if decision.shortfall_ngn else "—"
+    m3.metric("Shortfall", shortfall_label)
+    st.caption(f"FX change: {decision.fx_pct_change:+.2f}%")
+    if lines:
+        with st.expander("Raw scenario log"):
+            st.code("\n".join(lines), language="text")
+
+
 st.title("BobNairaAssist")
+st.warning(
+    "**DEMO_MODE is ON** (default). Offline mock bills + FX only — "
+    "no IBM / watsonx / cloud LLM credentials required."
+)
 st.caption(
     "Nigeria remittance + everyday money assistant · IBM Bob 2.0 LabLab demo · "
-    "DEMO_MODE (no cloud LLM)"
+    "builder Joshua Jubelo (Quantumwoof)"
 )
 
 st.markdown(
@@ -42,34 +84,40 @@ tab_demo, tab_play, tab_about = st.tabs(["Judge demo", "Playground", "About Bob"
 
 with tab_demo:
     st.subheader("Deterministic demo script")
-    st.write("Three fixed scenarios — same logic as `python -m bob_naira_assist`.")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        if st.button("1 · Quiet / healthy", use_container_width=True):
+    st.write(
+        "Three judge beats (same as `python -m bob_naira_assist`). "
+        "Optional fourth: send-now (also in Playground)."
+    )
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        if st.button("1 · Quiet", use_container_width=True, help="Buffer OK, stable FX, no remittance → quiet"):
             lines, decision = run_quiet_scenario()
-            st.code("\n".join(lines), language="text")
-            st.success(decision.action.value)
-    with col2:
-        if st.button("2 · Shortfall alert", use_container_width=True):
+            render_decision(decision, lines)
+    with c2:
+        if st.button("2 · Shortfall ping", use_container_width=True, help="Buffer below bills → ping_shortfall"):
             lines, decision = run_alert_scenario()
-            st.code("\n".join(lines), language="text")
-            st.warning(decision.action.value)
-    with col3:
-        if st.button("3 · FX wait", use_container_width=True):
-            lines, decision = run_fx_watch_scenario()
-            st.code("\n".join(lines), language="text")
-            st.info(decision.action.value)
+            render_decision(decision, lines)
+    with c3:
+        if st.button("3 · FX wait", use_container_width=True, help="Buffer OK, FX spike + remittance → suggest_wait"):
+            lines, decision = run_fx_wait_scenario()
+            render_decision(decision, lines)
+
+    st.divider()
+    if st.button("Optional · Send now", use_container_width=True, help="Buffer OK + stable FX + remittance → suggest_send_now"):
+        lines, decision = run_send_now_scenario()
+        render_decision(decision, lines)
 
 with tab_play:
     st.subheader("Adjust buffer & FX")
+    st.caption("DEMO_MODE playground — explore thresholds; not part of the three-beat judge story.")
     bills = sample_bills()
-    st.markdown("**Sample bills**")
+    st.markdown(f"**Sample bills** (total {fmt_ngn(total_due(bills))})")
     for b in bills:
         st.text(format_bill_line(b))
 
     buffer_ngn = st.slider("NGN cash buffer", 100_000, 600_000, 400_000, 10_000)
-    fx_scenario = st.selectbox("Mock FX", ["stable", "spike"])
-    remit_usd = st.number_input("Planned remittance (USD)", min_value=0, value=200, step=50)
+    fx_scenario = st.selectbox("Mock FX", ["stable", "watch", "spike"])
+    remit_usd = st.number_input("Planned remittance (USD)", min_value=0, value=0, step=50)
 
     if st.button("Evaluate", type="primary"):
         decision = evaluate_buffer(
@@ -78,8 +126,7 @@ with tab_play:
             mock_quote(fx_scenario),
             remittance_planned_usd=float(remit_usd) if remit_usd else None,
         )
-        st.metric("Action", decision.action.value)
-        st.write(decision.message)
+        render_decision(decision)
         for d in decision.details:
             st.caption(d)
 
