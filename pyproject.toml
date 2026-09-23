@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bob-naira-assist"
+version = "0.1.0"
+description = "Nigeria remittance + everyday money assistant (IBM Bob 2.0 demo)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Joshua Jubelo", email = "caughtsight007@gmail.com" }]
+dependencies = [
+  "streamlit>=1.28.0,<2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4.0,<9"]
+
+[tool.setuptools.packages.find]
+include = ["bob_naira_assist*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
