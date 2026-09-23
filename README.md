@@ -1,7 +1,5 @@
 # BobNairaAssist
 
-[![CI](https://github.com/Quantumwoof/bob-naira-assist/actions/workflows/ci.yml/badge.svg)](https://github.com/Quantumwoof/bob-naira-assist/actions/workflows/ci.yml)
-
 **Nigeria remittance + everyday money assistant** — built to showcase **IBM Bob IDE** as the core development partner (*turn idea into impact faster*).
 
 IBM Bob 2.0 LabLab hackathon · team **BobNairaAssist** · builder **Joshua Jubelo** (Quantumwoof) · Independent · Nigeria (Lokoja / Abuja)
@@ -13,6 +11,7 @@ IBM Bob 2.0 LabLab hackathon · team **BobNairaAssist** · builder **Joshua Jube
 | Status | Item |
 |--------|------|
 | **Works offline now** | `DEMO_MODE` CLI (`python -m bob_naira_assist` / `bob-naira-assist`), Streamlit UI, pytest, mock bills + FX decisions |
+| **CI workflow** | `.github/workflows/ci.yml` ready locally (pytest on 3.11/3.12); push blocked until `gh` token has `workflow` scope |
 | **Pending Bob access** | Exported Bob IDE session reports + screenshots in `bob_sessions/` (placeholders only until trial/Enterprise invite) |
 | **Not required for demo** | watsonx / cloud LLM / live bank or FX APIs |
 

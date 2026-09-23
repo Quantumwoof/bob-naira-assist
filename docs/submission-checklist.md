@@ -22,7 +22,7 @@ Use before the **Sep 27 2026 15:00 UTC** deadline.
 
 - [ ] `.env` with secrets never committed (`.env.example` only)
 - [ ] `.pytest_cache/` / `*.egg-info/` gitignored and untracked
-- [ ] CI green on `main` (`.github/workflows/ci.yml`)
+- [ ] CI green on `main` (add `.github/workflows/ci.yml` — needs GitHub `workflow` OAuth scope to push; file is ready in working tree)
 
 ## Builder facts (do not invent beyond)
 
