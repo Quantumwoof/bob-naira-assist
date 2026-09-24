@@ -109,6 +109,15 @@ watsonx is optional later and is **not** required for the offline demo.
 
 Earlier Quantumwoof experiments in the remittance / Naira space (separate repos; not copied here): `naira-pulse`, `edge-remit`, `voice-remit-ng`, `naira-remit`.
 
+
+## Residual blockers (this polish pass)
+
+| Blocker | Impact | Notes |
+|---------|--------|-------|
+| Bob IDE access | `bob_sessions/` still placeholders — no fake exports | Trial / Enterprise invite at kickoff Sep 25 |
+| GitHub `workflow` OAuth scope | Cannot push `.github/workflows/ci.yml` to `main` yet | File ready locally; CI note in checklist |
+| No watsonx / live FX | Offline DEMO only | Intentional for judge path |
+
 ## License
 
 MIT © 2026 Joshua Jubelo (Quantumwoof)

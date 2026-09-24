@@ -55,7 +55,7 @@ flowchart LR
 
 | Beat | Function | Expected action |
 |------|----------|-----------------|
-| Judge 1 | `run_quiet_scenario` | `quiet` (no remittance) |
+| Judge 1 | `run_quiet_scenario` | `quiet` (no remittance — never remittance-as-quiet) |
 | Judge 2 | `run_alert_scenario` | `ping_shortfall` |
 | Judge 3 | `run_fx_wait_scenario` | `suggest_wait` |
 | Optional | `run_send_now_scenario` | `suggest_send_now` |

@@ -99,3 +99,31 @@ def test_mock_quote_scenarios():
     assert mock_quote("stable").usd_ngn == 1600.0
     assert mock_quote("watch").usd_ngn == 1640.0
     assert mock_quote("spike").usd_ngn == 1680.0
+
+
+def test_fx_spike_without_remittance_is_watch_not_wait():
+    """Spike alone must not become suggest_wait — remittance must be planned."""
+    bills = sample_bills()
+    buffer = CashBuffer(500_000.0)
+    d = evaluate_buffer(bills, buffer, DEMO_FX_SPIKE, remittance_planned_usd=None)
+    assert d.action == ActionKind.PING_FX_WATCH
+    assert d.action != ActionKind.SUGGEST_WAIT
+    assert d.action != ActionKind.QUIET
+
+
+def test_shortfall_beats_fx_spike_and_remittance():
+    """Cash shortfall wins over FX wait even when remittance + spike are set."""
+    bills = sample_bills()
+    buffer = CashBuffer(280_000.0)
+    d = evaluate_buffer(bills, buffer, DEMO_FX_SPIKE, remittance_planned_usd=500.0)
+    assert d.action == ActionKind.PING_SHORTFALL
+
+
+def test_naira_strengthening_stays_quiet_without_remittance():
+    """Stronger naira (negative pct) is not adverse — stay quiet if buffer OK."""
+    bills = sample_bills()
+    fx = FxQuote(usd_ngn=1550.0, previous_usd_ngn=1600.0, as_of_label="stronger")
+    assert fx.pct_change < 0
+    assert not fx.naira_weakened
+    d = evaluate_buffer(bills, CashBuffer(400_000.0), fx, remittance_planned_usd=None)
+    assert d.action == ActionKind.QUIET

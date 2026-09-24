@@ -7,6 +7,7 @@ Use before the **Sep 27 2026 15:00 UTC** deadline.
 - [ ] `DEMO_MODE=1` (default) — no secrets, no watsonx required
 - [ ] `pytest -q` passes
 - [ ] `python -m bob_naira_assist` shows: `quiet` → `ping_shortfall` → `suggest_wait`
+- [ ] Quiet beat must **NOT** plan a remittance (no fake remittance-as-quiet)
 - [ ] `streamlit run app.py` — Judge demo buttons match those actions
 - [ ] Team link visible in README / About tab: https://lablab.ai/ai-hackathons/ibm-bob-2-hackathon/bobnairaassist
 

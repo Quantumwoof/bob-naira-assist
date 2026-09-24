@@ -88,24 +88,41 @@ with tab_demo:
         "Three judge beats (same as `python -m bob_naira_assist`). "
         "Optional fourth: send-now (also in Playground)."
     )
+    st.info(
+        "Click a beat below to evaluate. Order for judges: "
+        "**1 · Quiet** (no remittance) → **2 · Shortfall ping** → **3 · FX wait**. "
+        "Quiet is never faked as a remittance decision."
+    )
+    if "judge_decision" not in st.session_state:
+        st.session_state.judge_decision = None
+        st.session_state.judge_lines = None
     c1, c2, c3 = st.columns(3)
     with c1:
         if st.button("1 · Quiet", use_container_width=True, help="Buffer OK, stable FX, no remittance → quiet"):
             lines, decision = run_quiet_scenario()
-            render_decision(decision, lines)
+            st.session_state.judge_decision = decision
+            st.session_state.judge_lines = lines
     with c2:
         if st.button("2 · Shortfall ping", use_container_width=True, help="Buffer below bills → ping_shortfall"):
             lines, decision = run_alert_scenario()
-            render_decision(decision, lines)
+            st.session_state.judge_decision = decision
+            st.session_state.judge_lines = lines
     with c3:
         if st.button("3 · FX wait", use_container_width=True, help="Buffer OK, FX spike + remittance → suggest_wait"):
             lines, decision = run_fx_wait_scenario()
-            render_decision(decision, lines)
+            st.session_state.judge_decision = decision
+            st.session_state.judge_lines = lines
 
     st.divider()
     if st.button("Optional · Send now", use_container_width=True, help="Buffer OK + stable FX + remittance → suggest_send_now"):
         lines, decision = run_send_now_scenario()
-        render_decision(decision, lines)
+        st.session_state.judge_decision = decision
+        st.session_state.judge_lines = lines
+
+    if st.session_state.judge_decision is None:
+        st.caption("Empty state — pick a judge beat to see buffer, bills, and action.")
+    else:
+        render_decision(st.session_state.judge_decision, st.session_state.judge_lines)
 
 with tab_play:
     st.subheader("Adjust buffer & FX")

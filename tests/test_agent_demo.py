@@ -11,9 +11,10 @@ from bob_naira_assist.models import ActionKind
 
 
 def test_quiet_scenario_is_quiet():
-    _, d = run_quiet_scenario()
+    lines, d = run_quiet_scenario()
     assert d.action == ActionKind.QUIET
     assert d.shortfall_ngn == 0.0
+    assert "no remittance" in "\n".join(lines).lower()
 
 
 def test_alert_scenario_is_shortfall():
