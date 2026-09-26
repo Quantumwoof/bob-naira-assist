@@ -4,6 +4,10 @@
 
 IBM Bob 2.0 LabLab hackathon · team **BobNairaAssist** · builder **Joshua Jubelo** (Quantumwoof) · Independent · Nigeria (Lokoja / Abuja)
 
+**▶ Live demo (runs in your browser, DEMO_MODE):** https://quantumwoof.github.io/bob-naira-assist/ (first load takes 10–30 s while Pyodide downloads)
+
+![BobNairaAssist: quiet when your naira is safe, a ping when bills or FX need you. Built with IBM Bob IDE.](docs/cover.png)
+
 [Team page](https://lablab.ai/ai-hackathons/ibm-bob-2-hackathon/bobnairaassist) · Contact: caughtsight007@gmail.com · Org: [Quantumwoof](https://github.com/Quantumwoof)
 
 ## What works today vs pending
@@ -15,6 +19,7 @@ IBM Bob 2.0 LabLab hackathon · team **BobNairaAssist** · builder **Joshua Jube
 | **Bill-horizon / urgent bills** | `total_due` accepts `horizon_days`; shortfall message names bills due ≤3 days; Streamlit shows them in a warning box |
 | **CI workflow** | `.github/workflows/ci.yml` ready locally (pytest on 3.11/3.12); push blocked until `gh` token has `workflow` scope |
 | **Bob IDE sessions** | `bob_sessions/` holds real exported session reports (task-01 architecture review, task-02 decision fixes, task-03 UI & docs) |
+| **Live demo** | [`index.html`](index.html) serves the same `app.py` on GitHub Pages via [stlite](https://github.com/whitphx/stlite) (Pyodide), with no server and no keys |
 | **Not required for demo** | watsonx / cloud LLM / live bank or FX APIs |
 
 ## Problem / who for / why an agent
