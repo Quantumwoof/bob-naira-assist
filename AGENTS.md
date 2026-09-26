@@ -26,7 +26,7 @@ After each real Bob session: export the task report + screenshots into `bob_sess
 - `DEMO_MODE=1` by default; do not require IBM/watsonx credentials for the offline demo.
 - No secrets in git (no `.env` with keys, no passwords).
 - Do not invent builder bio beyond Joshua Jubelo / Quantumwoof facts in the README.
-- Session exports are empty until access lands — be honest in docs.
+- Only claim Bob work that is exported in `bob_sessions/` (task-01…task-03 so far); the initial scaffold predates Bob access.
 
 ## Access notes
 

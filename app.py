@@ -183,12 +183,17 @@ with tab_about:
     st.markdown(
         """
 ### IBM Bob IDE as core component
-This MVP is scaffolded so **Bob** can own multi-step build tasks once hackathon access
-lands (Enterprise invite ~40 Bobcoins at kickoff; personal trial usable now).
+The initial offline scaffold was written before Bob access. After that, three real
+**IBM Bob IDE** tasks moved the product forward (exports in **bob_sessions/**):
 
-- See **AGENTS.md** and **docs/bob-workflow.md** for planned Bob sessions.
-- Before final submit, export Bob task reports + screenshots into **bob_sessions/**.
-- Session reports are **pending** until Bob IDE access — we do not claim they exist yet.
+- **task-01 · architecture review** (0.216 Bobcoins) — read the whole repo, explained the
+  architecture and found **3 decision-logic gaps**. Read-only: no files changed.
+- **task-02 · fix the gaps** (1.01 Bobcoins) — new `suggest_send_later` outcome, bill horizon +
+  urgent bills, `0.0` remittance treated as none; 17 new tests → **36 passing**.
+- **task-03 · ship it to the UI** (1.89 Bobcoins) — Send-later button, Playground *strengthen*
+  FX scenario, urgent-bills warning, `run_send_later_scenario` + tests → **40 passing**; README refresh.
+
+About **3.1 of 40** hackathon Bobcoins used. See **AGENTS.md** for how to run further Bob tasks on this repo.
 
 ### Links
 - Team: [BobNairaAssist on LabLab](https://lablab.ai/ai-hackathons/ibm-bob-2-hackathon/bobnairaassist)

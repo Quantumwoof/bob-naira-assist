@@ -10,8 +10,8 @@ IBM Bob 2.0 LabLab hackathon · team **BobNairaAssist** · builder **Joshua Jube
 
 | Status | Item |
 |--------|------|
-| **Works offline now** | `DEMO_MODE` CLI, Streamlit UI, pytest — 5 decision outcomes, bill-horizon filter, urgent-bill naming |
-| **5 decision outcomes** | `quiet` · `ping_shortfall` (names urgent bills ≤3 days) · `ping_fx_watch` · `suggest_wait` · `suggest_send_now` · `suggest_send_later` (naira strengthening ≥3%) |
+| **Works offline now** | `DEMO_MODE` CLI, Streamlit UI, pytest (40 tests) — 6 decision outcomes, bill-horizon filter, urgent-bill naming |
+| **6 decision outcomes** | `quiet` · `ping_shortfall` (names urgent bills ≤3 days) · `ping_fx_watch` · `suggest_wait` · `suggest_send_now` · `suggest_send_later` (naira strengthening ≥3%) |
 | **Bill-horizon / urgent bills** | `total_due` accepts `horizon_days`; shortfall message names bills due ≤3 days; Streamlit shows them in a warning box |
 | **CI workflow** | `.github/workflows/ci.yml` ready locally (pytest on 3.11/3.12); push blocked until `gh` token has `workflow` scope |
 | **Bob IDE sessions** | `bob_sessions/` holds real exported session reports (task-01 architecture review, task-02 decision fixes, task-03 UI & docs) |
@@ -27,7 +27,7 @@ IBM Bob 2.0 LabLab hackathon · team **BobNairaAssist** · builder **Joshua Jube
 
 ## Judge demo beats (honest)
 
-CLI / Streamlit **Judge demo** run three deterministic beats, plus two optional extras:
+CLI / Streamlit **Judge demo** run three deterministic beats, plus two optional extras (the sixth outcome, `ping_fx_watch`, is reachable in the Playground with the `watch` FX scenario):
 
 1. **Quiet** — buffer covers bills, stable FX, **no** remittance planned → `quiet`
 2. **Shortfall ping** — buffer below bills → `ping_shortfall`; urgent bills due ≤3 days are named in the message and surfaced in the Streamlit warning box
@@ -35,7 +35,7 @@ CLI / Streamlit **Judge demo** run three deterministic beats, plus two optional 
 4. **Optional · Send now** (Playground / `run_send_now_scenario`): buffer OK + stable FX + remittance → `suggest_send_now`
 5. **Optional · Send later** (Playground / `run_send_later_scenario`): naira strengthening ≥3% (USD/NGN falling), remittance planned → `suggest_send_later` (advisory: fewer NGN per USD right now; consider waiting for a possible reversal)
 
-All five outcomes are implemented in [`decisions.py`](bob_naira_assist/decisions.py), tested in [`tests/test_fixes.py`](tests/test_fixes.py), and wired into Streamlit [`app.py`](app.py).
+All six outcomes are implemented in [`decisions.py`](bob_naira_assist/decisions.py), tested in [`tests/test_fixes.py`](tests/test_fixes.py), and wired into Streamlit [`app.py`](app.py).
 
 ## Architecture
 
@@ -98,10 +98,10 @@ Hackathon judging expects **IBM Bob IDE as a core component**. This repo is stru
 | Artifact | Purpose |
 |----------|---------|
 | [`AGENTS.md`](AGENTS.md) | How to run intentional multi-step Bob tasks on this codebase |
-| [`docs/bob-workflow.md`](docs/bob-workflow.md) | Planned sessions: scaffold, tests, docs, remittance-logic review |
+| [`docs/bob-workflow.md`](docs/bob-workflow.md) | The Bob workflow as it actually ran (3 tasks) + next candidate tasks |
 | [`bob_sessions/`](bob_sessions/) | Exported Bob IDE task reports + consumption screenshots (3 sessions) |
 
-**Access:** Hackathon Enterprise instance (40 Bobcoin budget). The three sessions used about 3.1 Bobcoins in total. Build window **Sep 25–27 2026**.
+**Access:** Hackathon Enterprise instance (40 Bobcoin budget). The three sessions used about 3.1 Bobcoins in total (0.216 + 1.01 + 1.89, per the consumption screenshots). Build window **Sep 25–27 2026**.
 
 ### Honest status
 

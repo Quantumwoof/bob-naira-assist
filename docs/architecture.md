@@ -1,7 +1,7 @@
 # Architecture
 
 BobNairaAssist keeps the agent story small and testable: pure Python decisions + Streamlit UI,
-with IBM Bob IDE as the planned build partner (session exports in `bob_sessions/`).
+with IBM Bob IDE as the build partner (three real session exports in `bob_sessions/`).
 
 ## Mermaid overview
 
@@ -68,6 +68,8 @@ flowchart LR
 | Judge 2 | `run_alert_scenario` | `ping_shortfall` |
 | Judge 3 | `run_fx_wait_scenario` | `suggest_wait` |
 | Optional | `run_send_now_scenario` | `suggest_send_now` |
+| Optional | `run_send_later_scenario` | `suggest_send_later` |
+| Playground | `watch` FX + any buffer ≥ bills | `ping_fx_watch` |
 
 ## Modules
 
@@ -75,7 +77,7 @@ flowchart LR
 |--------|------|
 | `models.py` | Bills, buffer, FX quote, `AgentDecision` |
 | `bills.py` | Deterministic sample Nigerian bills (total ₦327,500) |
-| `fx.py` | Mock `stable` / `watch` (~2.5%) / `spike` (5%) quotes |
+| `fx.py` | Mock `stable` / `watch` (~2.5% weaker) / `spike` (5% weaker) / `strengthen` (~3.1% stronger) quotes |
 | `decisions.py` | Pure quiet-vs-ping + remittance timing |
 | `agent.py` | DEMO_MODE scripted scenarios |
 | `demo.py` | Thin `python -m bob_naira_assist.demo` alias |
@@ -85,4 +87,4 @@ flowchart LR
 
 - Live bank APIs, live FX feeds, or paid SMS.
 - Required watsonx / cloud LLM for the offline demo.
-- Claiming Bob session reports before they are exported.
+- Claiming Bob output for code Bob did not write (the initial scaffold predates Bob access).

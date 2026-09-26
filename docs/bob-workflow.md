@@ -1,43 +1,35 @@
-# Planned IBM Bob IDE workflow
+# IBM Bob IDE workflow (as it actually ran)
 
 Bob is the **core development partner** for this hackathon entry (judging requirement).
-Until access is live, this doc is the contract for sessions we will run and export.
+Access: hackathon Enterprise instance (40 Bobcoin budget). Build window **Sep 25–27 2026**.
 
-## Access paths
+The initial offline scaffold (package layout, first decision rules, Streamlit shell, first
+tests) was written **before** Bob access and is not presented as Bob output.
 
-| Path | When | Notes |
-|------|------|-------|
-| Personal trial | Available now | May be used to start Bob tasks early |
-| Hackathon Enterprise invite | ~kickoff Sep 25 2026 | ~40 Bobcoins expected — use for denser multi-step sessions |
+## Sessions run (exports in `bob_sessions/`)
 
-Build window: **Sep 25–27 2026**. Submit by **Sep 27 15:00 UTC**.
+| # | Task given to Bob | Outcome | Bobcoins | Context |
+|---|-------------------|---------|----------|---------|
+| task-01 | Explain the architecture; walk through `evaluate_buffer`; list the top 3 decision-logic risks. **Read-only.** | Found 3 gaps: send-now during sharp naira strengthening; `total_due` ignoring `due_in_days`; `remittance_planned_usd=0.0` untested/ambiguous | 0.216 | 25.5k |
+| task-02 | Fix all three gaps, add tests, update `docs/architecture.md`, run pytest | New `suggest_send_later` outcome, `horizon_days` + `urgent_bills()`, `_is_remittance_planned()`; 17 new tests (19 → **36 passing**) | 1.01 | 36.0k |
+| task-03 | Wire `suggest_send_later` into Streamlit, add a scenario helper + tests, refresh README / `bob_sessions/README.md` | Send-later button, Playground `strengthen` FX, urgent-bills warning; `run_send_later_scenario` + 4 new tests → **40 passing** | 1.89 | 50.1k |
 
-## Planned Bob sessions (export each to `bob_sessions/`)
+Total ≈ **3.1 Bobcoins** of 40 (figures from the consumption screenshots in `bob_sessions/`).
 
-### Session 01 — Scaffold polish
-- Goal: Review package layout, `app.py`, CLI `__main__`, ignore secrets.
-- Deliverable: report + screenshot of Bob plan/diff.
+## Pattern that worked
 
-### Session 02 — Tests
-- Goal: Extend pytest coverage for `decisions.py` edge cases (exact shortfall boundary, FX thresholds).
-- Deliverable: report showing Bob-authored or Bob-reviewed tests.
+1. **Review first, read-only** — let Bob read the whole repo and name concrete risks with file/function citations.
+2. **Fix with guardrails** — one task that fixes, tests, documents, and runs `pytest`, with explicit "do not touch git / .env" limits.
+3. **Ship to the UI** — a follow-up task that carries the new behaviour through to the user-facing app and docs, again ending with a test run.
 
-### Session 03 — Docs
-- Goal: Tighten README quick start + architecture mermaid for judges.
-- Deliverable: markdown export + screenshot.
+## Next candidate Bob tasks
 
-### Session 04 — Remittance logic review
-- Goal: Have Bob critique quiet-vs-ping priority and remittance wait/send heuristics; apply safe fixes.
-- Deliverable: review notes in `bob_sessions/04-logic-review.md`.
+- Live FX adapter behind a feature flag (keep `DEMO_MODE` default), with Bob-generated contract tests.
+- Optional watsonx.ai (Granite) layer to phrase decisions in plain English / Pidgin — decisions stay deterministic.
+- CI workflow (`.github/workflows/ci.yml`) once the GitHub token has `workflow` scope.
 
 ## After each session
 
-1. Export Bob task report → `bob_sessions/NN-*.md`
-2. Add screenshots → `bob_sessions/NN-*.png`
+1. Export the Bob task report → `bob_sessions/task-NN-*.md`
+2. Add the consumption screenshot → `bob_sessions/task-NN-consumption.webp`
 3. Remove any secrets before commit
-4. Update main README status from “pending” to linked artifacts
-
-## What we will not claim
-
-Only the three real exported sessions in `bob_sessions/` (task-01 to task-03) are claimed.
-Code written outside Bob (the initial scaffold) is not presented as Bob output.

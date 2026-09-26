@@ -90,6 +90,6 @@ def run_demo_script() -> str:
         "Judge beats: quiet → shortfall ping → FX wait.\n"
         "Optional: send-now (run_send_now_scenario) and send-later (run_send_later_scenario).\n"
         "DEMO_MODE=1: no IBM/watsonx credentials required.\n"
-        "IBM Bob IDE is the planned core build partner (see AGENTS.md, bob_sessions/)."
+        "Built with IBM Bob IDE: exported task reports in bob_sessions/ (see AGENTS.md)."
     )
     return "\n\n".join(chunks) + footer
