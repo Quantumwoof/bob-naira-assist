@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<title>BobNairaAssist · live DEMO_MODE (runs in your browser)</title>
+<meta name="description" content="BobNairaAssist: Nigeria bills + USD to NGN remittance timing assistant. The same Streamlit app.py, running fully in your browser via stlite (Pyodide). Offline DEMO_MODE, no API keys. Built with IBM Bob IDE." />
+<link rel="icon" href="data:," />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser@1.9.2/build/stlite.css" />
+<style>
+  #boot { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #31333f; max-width: 640px; margin: 14vh auto; padding: 0 24px; text-align: center; }
+  #boot small { color: #6b6f7b; line-height: 1.5; }
+</style>
+</head>
+<body>
+<!--
+  Static, serverless build of the repo's Streamlit app for GitHub Pages.
+  stlite runs app.py + bob_naira_assist/ inside the browser with Pyodide (WebAssembly).
+  Files are fetched straight from this repo, so the page always matches main.
+-->
+<div id="root">
+  <div id="boot">
+    <h2>BobNairaAssist</h2>
+    <p>Loading the Streamlit app in your browser…</p>
+    <small>First load downloads a Python runtime (Pyodide) and can take 10–30 seconds.<br/>
+    No server and no API keys: offline DEMO_MODE with mock bills and FX.</small>
+  </div>
+</div>
+<script type="module">
+  import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@1.9.2/build/stlite.js";
+  mount({
+    requirements: [],
+    entrypoint: "app.py",
+    streamlitConfig: { "client.toolbarMode": "viewer" },
+    files: {
+      "app.py": { url: "./app.py" },
+      "bob_naira_assist/__init__.py": { url: "./bob_naira_assist/__init__.py" },
+      "bob_naira_assist/__main__.py": { url: "./bob_naira_assist/__main__.py" },
+      "bob_naira_assist/agent.py": { url: "./bob_naira_assist/agent.py" },
+      "bob_naira_assist/bills.py": { url: "./bob_naira_assist/bills.py" },
+      "bob_naira_assist/decisions.py": { url: "./bob_naira_assist/decisions.py" },
+      "bob_naira_assist/demo.py": { url: "./bob_naira_assist/demo.py" },
+      "bob_naira_assist/fx.py": { url: "./bob_naira_assist/fx.py" },
+      "bob_naira_assist/models.py": { url: "./bob_naira_assist/models.py" },    },
+  }, document.getElementById("root"));
+</script>
+</body>
+</html>
