@@ -52,7 +52,8 @@ def render_decision(decision: AgentDecision, lines: list[str] | None = None) -> 
     else:
         st.info(badge)
 
-    st.write(decision.message)
+    # Escape $ so Streamlit markdown doesn't treat "$ ... $500" as LaTeX math.
+    st.write(decision.message.replace("$", "\\$"))
     m1, m2, m3 = st.columns(3)
     m1.metric("Buffer", fmt_ngn(decision.buffer_ngn))
     m2.metric("Bills total", fmt_ngn(decision.bills_total_ngn))
