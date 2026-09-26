@@ -63,12 +63,25 @@ def test_boundary_one_naira_under_triggers_shortfall():
     assert d.shortfall_ngn == SHORTFALL_PING_THRESHOLD_NGN
 
 
-def test_fx_spike_suggests_wait_when_buffer_ok():
+def test_fx_spike_suggests_send_now_when_buffer_ok():
+    """Sharp naira weakening with planned remittance → suggest_send_now.
+
+    A weakening naira is FAVOURABLE for the USD sender: each dollar buys more NGN.
+    The correct advice is to consider sending now, not to wait.
+    """
     bills = sample_bills()
     buffer = CashBuffer(500_000.0)
     d = evaluate_buffer(bills, buffer, DEMO_FX_SPIKE, remittance_planned_usd=500.0)
-    assert d.action == ActionKind.SUGGEST_WAIT
+    assert d.action == ActionKind.SUGGEST_SEND_NOW
     assert d.fx_pct_change > FX_WAIT_PCT
+
+
+def test_fx_spike_with_remittance_never_returns_suggest_wait():
+    """Regression: a sharp naira-weakening spike + remittance must NEVER return suggest_wait."""
+    bills = sample_bills()
+    buffer = CashBuffer(500_000.0)
+    d = evaluate_buffer(bills, buffer, DEMO_FX_SPIKE, remittance_planned_usd=500.0)
+    assert d.action != ActionKind.SUGGEST_WAIT
 
 
 def test_fx_watch_between_two_and_three_percent():
@@ -101,13 +114,14 @@ def test_mock_quote_scenarios():
     assert mock_quote("spike").usd_ngn == 1680.0
 
 
-def test_fx_spike_without_remittance_is_watch_not_wait():
-    """Spike alone must not become suggest_wait — remittance must be planned."""
+def test_fx_spike_without_remittance_is_watch_not_send_now():
+    """Spike alone (no remittance) must give ping_fx_watch, not suggest_send_now."""
     bills = sample_bills()
     buffer = CashBuffer(500_000.0)
     d = evaluate_buffer(bills, buffer, DEMO_FX_SPIKE, remittance_planned_usd=None)
     assert d.action == ActionKind.PING_FX_WATCH
     assert d.action != ActionKind.SUGGEST_WAIT
+    assert d.action != ActionKind.SUGGEST_SEND_NOW
     assert d.action != ActionKind.QUIET
 
 

@@ -8,7 +8,7 @@ import streamlit as st
 
 from bob_naira_assist.agent import (
     run_alert_scenario,
-    run_fx_wait_scenario,
+    run_fx_send_now_scenario,
     run_quiet_scenario,
     run_send_later_scenario,
     run_send_now_scenario,
@@ -92,7 +92,7 @@ with tab_demo:
     )
     st.info(
         "Click a beat below to evaluate. Order for judges: "
-        "**1 · Quiet** → **2 · Shortfall ping** → **3 · FX wait**. "
+        "**1 · Quiet** → **2 · Shortfall ping** → **3 · FX spike → send now**. "
         "Quiet is never faked as a remittance decision."
     )
     if "judge_decision" not in st.session_state:
@@ -110,8 +110,8 @@ with tab_demo:
             st.session_state.judge_decision = decision
             st.session_state.judge_lines = lines
     with c3:
-        if st.button("3 · FX wait", use_container_width=True, help="Buffer OK, FX spike ≥3%, remittance planned → suggest_wait"):
-            lines, decision = run_fx_wait_scenario()
+        if st.button("3 · FX spike → send now", use_container_width=True, help="Buffer OK, FX spike ≥3% (naira weaker, favourable for sender), remittance planned → suggest_send_now"):
+            lines, decision = run_fx_send_now_scenario()
             st.session_state.judge_decision = decision
             st.session_state.judge_lines = lines
 
@@ -154,8 +154,8 @@ with tab_play:
         "Mock FX scenario",
         ["stable", "watch", "spike", "strengthen"],
         help=(
-            "stable: mild move · watch: naira weaker ~2.5% · "
-            "spike: naira weaker 5% (suggest_wait with remittance) · "
+            "stable: mild move · watch: naira weaker ~2.5% (ping_fx_watch) · "
+            "spike: naira weaker 5% (suggest_send_now with remittance — rate favours sender) · "
             "strengthen: naira stronger ≥3% (suggest_send_later with remittance)"
         ),
     )
@@ -192,8 +192,11 @@ The initial offline scaffold was written before Bob access. After that, three re
   urgent bills, `0.0` remittance treated as none; 17 new tests → **36 passing**.
 - **task-03 · ship it to the UI** (1.89 Bobcoins) — Send-later button, Playground *strengthen*
   FX scenario, urgent-bills warning, `run_send_later_scenario` + tests → **40 passing**; README refresh.
+- **task-04 · fix FX economic logic** — corrected beat 3: naira-weakening spike is
+  *favourable* for the USD sender (each $ buys more NGN), so the agent now advises
+  `suggest_send_now` (not the old incorrect `suggest_wait`).
 
-About **3.1 of 40** hackathon Bobcoins used. See **AGENTS.md** for how to run further Bob tasks on this repo.
+See **AGENTS.md** for how to run further Bob tasks on this repo.
 
 ### Links
 - Team: [BobNairaAssist on LabLab](https://lablab.ai/ai-hackathons/ibm-bob-2-hackathon/bobnairaassist)

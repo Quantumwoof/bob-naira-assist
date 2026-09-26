@@ -182,8 +182,8 @@ def test_zero_remittance_is_quiet_not_send_now():
     assert d_zero.action == d_none.action
 
 
-def test_zero_remittance_does_not_trigger_suggest_wait_on_spike():
-    """0.0 must not trigger SUGGEST_WAIT — falls through to PING_FX_WATCH like None."""
+def test_zero_remittance_does_not_trigger_suggest_send_now_on_spike():
+    """0.0 must not trigger SUGGEST_SEND_NOW on a spike — falls through to PING_FX_WATCH like None."""
     from bob_naira_assist.fx import DEMO_FX_SPIKE
 
     bills = sample_bills()
@@ -192,6 +192,8 @@ def test_zero_remittance_does_not_trigger_suggest_wait_on_spike():
     d_none = evaluate_buffer(bills, buffer, DEMO_FX_SPIKE, remittance_planned_usd=None)
     assert d_zero.action == ActionKind.PING_FX_WATCH
     assert d_none.action == ActionKind.PING_FX_WATCH
+    assert d_zero.action != ActionKind.SUGGEST_WAIT
+    assert d_zero.action != ActionKind.SUGGEST_SEND_NOW
 
 
 def test_zero_remittance_does_not_trigger_suggest_send_later():

@@ -16,7 +16,9 @@ from bob_naira_assist.models import (
 # Thresholds kept simple and documented for judges / Bob IDE review.
 SHORTFALL_PING_THRESHOLD_NGN = 1.0  # any material shortfall
 FX_WATCH_PCT = 2.0  # ping if USD/NGN moves >= 2% adverse (naira weaker)
-FX_WAIT_PCT = 3.0  # suggest waiting if spike is large (may mean-revert in demo story)
+# When naira weakens sharply (USD/NGN rises >= this %), each USD buys MORE naira —
+# from the sender's view this is a favourable rate worth acting on before it reverts.
+FX_WAIT_PCT = 3.0  # threshold for "sharp" naira weakening that triggers send-now advice
 # When naira strengthens sharply (USD/NGN falls >= this %), sending now locks in
 # fewer naira for the recipient — warn to consider waiting for a potential reversal.
 FX_STRENGTHENING_PCT = 3.0
@@ -39,8 +41,12 @@ def evaluate_buffer(
     Priority:
     1. Cash shortfall vs upcoming bills (within 30-day horizon) → ping_shortfall
        Urgent bills (due ≤ 3 days) are named explicitly in the shortfall reason.
-    2. Adverse FX ≥ FX_WAIT_PCT + remittance planned → suggest_wait
-       else adverse FX ≥ FX_WATCH_PCT → ping_fx_watch
+    2. Naira weakening (adverse FX, USD/NGN rising):
+       a. >= FX_WAIT_PCT + remittance planned → suggest_send_now
+          Rationale: each USD now buys MORE naira; favourable for the sender.
+          The rate may revert, so acting now (or splitting) is worth considering.
+       b. >= FX_WATCH_PCT (no remittance, or spike below FX_WAIT_PCT) → ping_fx_watch
+          Household costs in NGN may rise; watch the rate.
     3. Naira strengthening sharply (USD/NGN falling ≥ FX_STRENGTHENING_PCT)
        + remittance planned → suggest_send_later
        Sending now yields fewer naira; waiting is worthwhile IF the move reverses —
@@ -80,11 +86,14 @@ def evaluate_buffer(
     adverse = fx.naira_weakened and abs(fx.pct_change) >= FX_WATCH_PCT
     if adverse:
         if abs(fx.pct_change) >= FX_WAIT_PCT and planned:
+            # Naira weakens sharply: each USD now buys MORE naira — favourable for the
+            # sender.  Suggest acting now (or splitting) before the rate reverts.
             tip = (
-                f"FX spiked {fx.pct_change:+.2f}%. Suggest WAIT before sending "
-                f"${remittance_planned_usd:,.0f} — demo assumes possible mean-reversion."
+                f"Rate moved in your favour ({fx.pct_change:+.2f}%): each $ buys more naira now; "
+                f"consider sending ${remittance_planned_usd:,.0f} now or splitting, "
+                "the move may revert."
             )
-            action = ActionKind.SUGGEST_WAIT
+            action = ActionKind.SUGGEST_SEND_NOW
         else:
             tip = (
                 f"FX moved {fx.pct_change:+.2f}% (naira weaker). "

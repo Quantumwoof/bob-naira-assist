@@ -50,11 +50,20 @@ flowchart LR
 
 1. Cash shortfall vs bills (within 30-day horizon) → `ping_shortfall`
    Bills due within 3 days are named as **urgent** in the ping message.
-2. Adverse FX ≥ 3% + remittance planned → `suggest_wait`; else adverse FX ≥ 2% → `ping_fx_watch`
+2. Naira **weakening** (adverse FX, USD/NGN rising):
+   - ≥ 3% + remittance planned → `suggest_send_now`
+     Rationale: a weakening naira is *favourable* for the USD sender — each dollar buys more NGN.
+     The agent advises sending now (or splitting) before the rate potentially reverts.
+   - ≥ 2% (no remittance, or below 3% threshold) → `ping_fx_watch`
+     Household costs in NGN may rise; watch the rate.
 3. Naira **strengthening** sharply (USD/NGN falling ≥ 3%) + remittance planned → `suggest_send_later`
    Sending now yields fewer naira per dollar; advisory wait in case of reversal.
 4. Remittance planned + FX stable (pct ≤ 0.5) → `suggest_send_now`
 5. Else → `quiet`
+
+> **`suggest_wait` is deprecated.** It was the previous (economically incorrect) outcome for
+> naira-weakening spikes. It is kept in the `ActionKind` enum only so the Streamlit style map
+> does not break, but it is never returned by `evaluate_buffer`.
 
 ### Edge-case rules
 - `remittance_planned_usd=0.0` is treated identically to `None` — no remittance actions fire.
@@ -66,10 +75,12 @@ flowchart LR
 |------|----------|-----------------|
 | Judge 1 | `run_quiet_scenario` | `quiet` (no remittance — never remittance-as-quiet) |
 | Judge 2 | `run_alert_scenario` | `ping_shortfall` |
-| Judge 3 | `run_fx_wait_scenario` | `suggest_wait` |
-| Optional | `run_send_now_scenario` | `suggest_send_now` |
+| Judge 3 | `run_fx_send_now_scenario` | `suggest_send_now` (FX spike favours sender) |
+| Optional | `run_send_now_scenario` | `suggest_send_now` (stable FX) |
 | Optional | `run_send_later_scenario` | `suggest_send_later` |
 | Playground | `watch` FX + any buffer ≥ bills | `ping_fx_watch` |
+
+`run_fx_wait_scenario` is kept as a back-compat alias for `run_fx_send_now_scenario`.
 
 ## Modules
 

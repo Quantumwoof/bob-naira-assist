@@ -44,17 +44,23 @@ def run_alert_scenario() -> Tuple[List[str], AgentDecision]:
     return _scenario_lines("shortfall ping", buffer, decision, bills), decision
 
 
-def run_fx_wait_scenario() -> Tuple[List[str], AgentDecision]:
-    """Buffer OK but FX spiked (≥3%) with remittance planned → suggest_wait."""
+def run_fx_send_now_scenario() -> Tuple[List[str], AgentDecision]:
+    """Buffer OK, FX spiked ≥3% (naira weaker) with remittance planned → suggest_send_now.
+
+    A weakening naira is FAVOURABLE for the USD sender: each dollar now buys more NGN.
+    The agent advises sending now (or splitting) before the rate potentially reverts.
+    """
     bills = sample_bills()
     buffer = CashBuffer(balance_ngn=500_000.0)
     fx = mock_quote("spike")
     decision = evaluate_buffer(bills, buffer, fx, remittance_planned_usd=500.0)
-    return _scenario_lines("FX wait", buffer, decision, bills), decision
+    return _scenario_lines("FX spike → send now (favourable rate)", buffer, decision, bills), decision
 
 
-# Back-compat alias used by older docs/imports.
-run_fx_watch_scenario = run_fx_wait_scenario
+# Back-compat aliases — old name pointed to the wrong economic story; kept so
+# any existing imports or older docs do not break.
+run_fx_wait_scenario = run_fx_send_now_scenario
+run_fx_watch_scenario = run_fx_send_now_scenario
 
 
 def run_send_now_scenario() -> Tuple[List[str], AgentDecision]:
@@ -80,15 +86,15 @@ def run_send_later_scenario() -> Tuple[List[str], AgentDecision]:
 
 
 def run_demo_script() -> str:
-    """Judge CLI story: quiet → shortfall → FX wait (send-now/send-later are optional/playground)."""
+    """Judge CLI story: quiet → shortfall → FX spike → send now (send-later is optional/playground)."""
     chunks: List[str] = []
-    for runner in (run_quiet_scenario, run_alert_scenario, run_fx_wait_scenario):
+    for runner in (run_quiet_scenario, run_alert_scenario, run_fx_send_now_scenario):
         lines, _ = runner()
         chunks.append("\n".join(lines))
     footer = (
         "\n---\n"
-        "Judge beats: quiet → shortfall ping → FX wait.\n"
-        "Optional: send-now (run_send_now_scenario) and send-later (run_send_later_scenario).\n"
+        "Judge beats: quiet → shortfall ping → FX spike → send now (favourable rate).\n"
+        "Optional: send-later (run_send_later_scenario).\n"
         "DEMO_MODE=1: no IBM/watsonx credentials required.\n"
         "Built with IBM Bob IDE: exported task reports in bob_sessions/ (see AGENTS.md)."
     )

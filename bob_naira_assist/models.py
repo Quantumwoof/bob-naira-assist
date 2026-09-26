@@ -57,6 +57,10 @@ class ActionKind(str, Enum):
     QUIET = "quiet"
     PING_SHORTFALL = "ping_shortfall"
     PING_FX_WATCH = "ping_fx_watch"
+    # DEPRECATED: suggest_wait was the old naira-weakening + remittance outcome.
+    # A weakening naira is FAVOURABLE for the USD sender (each $ buys more NGN),
+    # so the correct advice is suggest_send_now, not to wait.
+    # Kept here only to avoid breaking the Streamlit ACTION_STYLE map.
     SUGGEST_WAIT = "suggest_wait"
     SUGGEST_SEND_NOW = "suggest_send_now"
     SUGGEST_SEND_LATER = "suggest_send_later"

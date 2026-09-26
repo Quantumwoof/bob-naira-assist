@@ -23,14 +23,17 @@ Run `python -m bob_naira_assist`. Point to the three judge beats:
 
 1. **Quiet** — buffer covers bills, stable FX, **no** remittance planned → `quiet`
 2. **Shortfall ping** — buffer too low → `ping_shortfall`
-3. **FX wait** — buffer OK but spiked FX + remittance planned → `suggest_wait`
+3. **FX spike → send now** — buffer OK, FX spiked ≥3% (naira weaker, **favourable for the sender**),
+   remittance planned → `suggest_send_now`.
+   Key insight: a weakening naira means each USD buys *more* NGN — the agent tells you to act
+   before the rate reverts, not to wait.
 
-Optional (Playground / UI button): **Send now** — healthy buffer + stable FX + remittance → `suggest_send_now`.
+Optional (Playground / UI button): **Send later** — naira strengthening ≥3% + remittance → `suggest_send_later`.
 
 ## Minute 2:00 — Streamlit
 
-Open **Judge demo** tab → click **1 · Quiet**, **2 · Shortfall ping**, **3 · FX wait**.
-Optionally **Optional · Send now** or use **Playground** (buffer slider, FX `stable` / `watch` / `spike`).
+Open **Judge demo** tab → click **1 · Quiet**, **2 · Shortfall ping**, **3 · FX spike → send now**.
+Optionally **Optional · Send later** or use **Playground** (buffer slider, FX `stable` / `watch` / `spike` / `strengthen`).
 
 Banner confirms **DEMO_MODE is ON**.
 
