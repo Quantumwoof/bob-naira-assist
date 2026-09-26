@@ -59,6 +59,7 @@ class ActionKind(str, Enum):
     PING_FX_WATCH = "ping_fx_watch"
     SUGGEST_WAIT = "suggest_wait"
     SUGGEST_SEND_NOW = "suggest_send_now"
+    SUGGEST_SEND_LATER = "suggest_send_later"
 
 
 @dataclass(frozen=True)

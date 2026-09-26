@@ -39,5 +39,5 @@ Build window: **Sep 25–27 2026**. Submit by **Sep 27 15:00 UTC**.
 
 ## What we will not claim
 
-We will **not** claim Bob session reports already exist until files are present under
-`bob_sessions/` (beyond this placeholder README).
+Only the three real exported sessions in `bob_sessions/` (task-01 to task-03) are claimed.
+Code written outside Bob (the initial scaffold) is not presented as Bob output.

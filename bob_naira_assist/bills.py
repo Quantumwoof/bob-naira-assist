@@ -17,8 +17,26 @@ def sample_bills() -> List[Bill]:
     ]
 
 
-def total_due(bills: List[Bill]) -> float:
-    return sum(b.amount_ngn for b in bills)
+# Bills due within this many days are flagged urgent in shortfall messages.
+URGENT_DAYS = 3
+
+
+def total_due(bills: List[Bill], horizon_days: int = 30) -> float:
+    """Sum amounts for bills due within *horizon_days* days (inclusive).
+
+    Bills whose ``due_in_days`` exceeds *horizon_days* are excluded.
+    Default horizon of 30 days preserves the original behaviour for all
+    sample bills (max due_in_days = 5).
+    """
+    return sum(b.amount_ngn for b in bills if b.due_in_days <= horizon_days)
+
+
+def urgent_bills(bills: List[Bill]) -> List[Bill]:
+    """Return bills due within URGENT_DAYS days, sorted soonest first."""
+    return sorted(
+        (b for b in bills if b.due_in_days <= URGENT_DAYS),
+        key=lambda b: b.due_in_days,
+    )
 
 
 def format_bill_line(bill: Bill) -> str:

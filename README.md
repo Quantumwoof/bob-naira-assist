@@ -10,9 +10,11 @@ IBM Bob 2.0 LabLab hackathon · team **BobNairaAssist** · builder **Joshua Jube
 
 | Status | Item |
 |--------|------|
-| **Works offline now** | `DEMO_MODE` CLI (`python -m bob_naira_assist` / `bob-naira-assist`), Streamlit UI, pytest, mock bills + FX decisions |
+| **Works offline now** | `DEMO_MODE` CLI, Streamlit UI, pytest — 5 decision outcomes, bill-horizon filter, urgent-bill naming |
+| **5 decision outcomes** | `quiet` · `ping_shortfall` (names urgent bills ≤3 days) · `ping_fx_watch` · `suggest_wait` · `suggest_send_now` · `suggest_send_later` (naira strengthening ≥3%) |
+| **Bill-horizon / urgent bills** | `total_due` accepts `horizon_days`; shortfall message names bills due ≤3 days; Streamlit shows them in a warning box |
 | **CI workflow** | `.github/workflows/ci.yml` ready locally (pytest on 3.11/3.12); push blocked until `gh` token has `workflow` scope |
-| **Pending Bob access** | Exported Bob IDE session reports + screenshots in `bob_sessions/` (placeholders only until trial/Enterprise invite) |
+| **Bob IDE sessions** | `bob_sessions/` holds real exported session reports (task-01 architecture review, task-02 decision fixes, task-03 UI & docs) |
 | **Not required for demo** | watsonx / cloud LLM / live bank or FX APIs |
 
 ## Problem / who for / why an agent
@@ -25,13 +27,15 @@ IBM Bob 2.0 LabLab hackathon · team **BobNairaAssist** · builder **Joshua Jube
 
 ## Judge demo beats (honest)
 
-CLI / Streamlit **Judge demo** run three deterministic beats:
+CLI / Streamlit **Judge demo** run three deterministic beats, plus two optional extras:
 
 1. **Quiet** — buffer covers bills, stable FX, **no** remittance planned → `quiet`
-2. **Shortfall ping** — buffer below bills → `ping_shortfall`
-3. **FX wait** — buffer OK, FX spike ≥3%, remittance planned → `suggest_wait`
+2. **Shortfall ping** — buffer below bills → `ping_shortfall`; urgent bills due ≤3 days are named in the message and surfaced in the Streamlit warning box
+3. **FX wait** — buffer OK, FX spike ≥3% (naira weaker), remittance planned → `suggest_wait`
+4. **Optional · Send now** (Playground / `run_send_now_scenario`): buffer OK + stable FX + remittance → `suggest_send_now`
+5. **Optional · Send later** (Playground / `run_send_later_scenario`): naira strengthening ≥3% (USD/NGN falling), remittance planned → `suggest_send_later` (advisory: fewer NGN per USD right now; consider waiting for a possible reversal)
 
-**Optional 4th** (Playground / `run_send_now_scenario`): buffer OK + stable FX + remittance → `suggest_send_now`.
+All five outcomes are implemented in [`decisions.py`](bob_naira_assist/decisions.py), tested in [`tests/test_fixes.py`](tests/test_fixes.py), and wired into Streamlit [`app.py`](app.py).
 
 ## Architecture
 
@@ -87,7 +91,7 @@ streamlit run app.py
 
 Optional env template (empty keys only): [`.env.example`](.env.example).
 
-## How IBM Bob is / will be used
+## How IBM Bob was used
 
 Hackathon judging expects **IBM Bob IDE as a core component**. This repo is structured for that:
 
@@ -95,13 +99,13 @@ Hackathon judging expects **IBM Bob IDE as a core component**. This repo is stru
 |----------|---------|
 | [`AGENTS.md`](AGENTS.md) | How to run intentional multi-step Bob tasks on this codebase |
 | [`docs/bob-workflow.md`](docs/bob-workflow.md) | Planned sessions: scaffold, tests, docs, remittance-logic review |
-| [`bob_sessions/`](bob_sessions/) | **Required before final submit:** exported Bob task reports + screenshots |
+| [`bob_sessions/`](bob_sessions/) | Exported Bob IDE task reports + consumption screenshots (3 sessions) |
 
-**Access:** Personal trial may be used now; hackathon Enterprise invite (~40 Bobcoins) may arrive at kickoff. Build window **Sep 25–27 2026**; submit by **Sep 27 15:00 UTC**.
+**Access:** Hackathon Enterprise instance (40 Bobcoin budget). The three sessions used about 3.1 Bobcoins in total. Build window **Sep 25–27 2026**.
 
 ### Honest status
 
-**Bob session reports are pending** until Bob IDE access is available. `bob_sessions/` currently holds placeholders only — we do not claim completed session exports yet.
+Three real Bob IDE session exports are in `bob_sessions/`: task-01 (architecture review), task-02 (decision-logic fixes), task-03 (UI wiring + docs). Each includes a markdown report and a screenshot.
 
 watsonx is optional later and is **not** required for the offline demo.
 
@@ -110,11 +114,10 @@ watsonx is optional later and is **not** required for the offline demo.
 Earlier Quantumwoof experiments in the remittance / Naira space (separate repos; not copied here): `naira-pulse`, `edge-remit`, `voice-remit-ng`, `naira-remit`.
 
 
-## Residual blockers (this polish pass)
+## Known limitations
 
 | Blocker | Impact | Notes |
 |---------|--------|-------|
-| Bob IDE access | `bob_sessions/` still placeholders — no fake exports | Trial / Enterprise invite at kickoff Sep 25 |
 | GitHub `workflow` OAuth scope | Cannot push `.github/workflows/ci.yml` to `main` yet | File ready locally; CI note in checklist |
 | No watsonx / live FX | Offline DEMO only | Intentional for judge path |
 

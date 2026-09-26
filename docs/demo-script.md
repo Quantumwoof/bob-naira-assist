@@ -36,9 +36,10 @@ Banner confirms **DEMO_MODE is ON**.
 
 ## Minute 2:30 — Bob as core component
 
-Open `AGENTS.md` + `docs/bob-workflow.md`. Explain planned Bob sessions and that
-`bob_sessions/` will hold exported task reports + screenshots before final submit.
-**Honest:** reports are pending until Bob IDE access (trial / Enterprise invite).
+Open `bob_sessions/README.md`. Show the three real Bob tasks: task-01 Bob reviewed the
+architecture and found three decision-logic gaps; task-02 Bob fixed them with new tests;
+task-03 Bob wired the new `suggest_send_later` outcome into the Streamlit UI and refreshed docs.
+Show one consumption screenshot (about 3.1 Bobcoins used across all three).
 
 ## Minute 3:00 — Links
 

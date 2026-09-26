@@ -24,6 +24,7 @@ flowchart LR
     FxWatch[ping_fx_watch]
     Wait[suggest_wait]
     Send[suggest_send_now]
+    SendLater[suggest_send_later]
     UI[Streamlit app.py]
     CLI[python -m bob_naira_assist]
   end
@@ -36,6 +37,7 @@ flowchart LR
   Eval --> FxWatch
   Eval --> Wait
   Eval --> Send
+  Eval --> SendLater
   Agent --> CLI
   Eval --> UI
   Agent --> UI
@@ -46,10 +48,17 @@ flowchart LR
 
 ## Decision priority (`decisions.py`)
 
-1. Cash shortfall vs bills → `ping_shortfall`
+1. Cash shortfall vs bills (within 30-day horizon) → `ping_shortfall`
+   Bills due within 3 days are named as **urgent** in the ping message.
 2. Adverse FX ≥ 3% + remittance planned → `suggest_wait`; else adverse FX ≥ 2% → `ping_fx_watch`
-3. Remittance planned + FX stable (pct ≤ 0.5) → `suggest_send_now`
-4. Else → `quiet`
+3. Naira **strengthening** sharply (USD/NGN falling ≥ 3%) + remittance planned → `suggest_send_later`
+   Sending now yields fewer naira per dollar; advisory wait in case of reversal.
+4. Remittance planned + FX stable (pct ≤ 0.5) → `suggest_send_now`
+5. Else → `quiet`
+
+### Edge-case rules
+- `remittance_planned_usd=0.0` is treated identically to `None` — no remittance actions fire.
+- `total_due(bills, horizon_days=N)` excludes bills whose `due_in_days > N` (default 30).
 
 ## Demo scenarios (`agent.py`)
 

@@ -18,9 +18,10 @@
 | Session 01 screenshot | `01-scaffold.png` |
 | Later sessions | `02-tests-report.md`, `03-docs-report.md`, … |
 
-## Status
+## Exported sessions
 
-**Placeholder only** (`.gitkeep`). Session reports are **pending** until Bob IDE access
-(personal trial and/or hackathon Enterprise invite ~40 Bobcoins at kickoff).
-
-Do **not** claim completed Bob session exports until real files are here.
+| Session | Artifacts | What Bob did |
+|---------|-----------|--------------|
+| **task-01** | [`task-01-architecture-review.md`](task-01-architecture-review.md) · [`task-01-consumption.webp`](task-01-consumption.webp) | Reviewed end-to-end architecture; identified three decision-logic gaps (send-now suggested during sharp naira strengthening, `total_due` ignoring `Bill.due_in_days`, `remittance_planned_usd=0.0` untested); produced a detailed findings report |
+| **task-02** | [`task-02-fix-decision-gaps.md`](task-02-fix-decision-gaps.md) · [`task-02-consumption.webp`](task-02-consumption.webp) | Implemented all three fixes across `decisions.py`, `bills.py`, and `models.py`; wrote 20+ pytest cases in `tests/test_fixes.py`; all tests passing |
+| **task-03** | [`task-03-ui-and-docs.md`](task-03-ui-and-docs.md) · [`task-03-consumption.webp`](task-03-consumption.webp) | Wired `SUGGEST_SEND_LATER` into `app.py` (ACTION_STYLE, Judge demo button, Playground "strengthen" FX scenario, urgent-bills warning box); added `run_send_later_scenario` helper and 4 new tests; refreshed README and this file |

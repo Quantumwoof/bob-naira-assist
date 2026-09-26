@@ -10,9 +10,10 @@ from bob_naira_assist.agent import (
     run_alert_scenario,
     run_fx_wait_scenario,
     run_quiet_scenario,
+    run_send_later_scenario,
     run_send_now_scenario,
 )
-from bob_naira_assist.bills import format_bill_line, sample_bills, total_due
+from bob_naira_assist.bills import format_bill_line, sample_bills, total_due, urgent_bills
 from bob_naira_assist.decisions import evaluate_buffer
 from bob_naira_assist.fx import mock_quote
 from bob_naira_assist.models import ActionKind, AgentDecision, CashBuffer
@@ -31,6 +32,7 @@ ACTION_STYLE = {
     ActionKind.PING_FX_WATCH: ("warning", "🟡"),
     ActionKind.SUGGEST_WAIT: ("warning", "🟠"),
     ActionKind.SUGGEST_SEND_NOW: ("info", "🔵"),
+    ActionKind.SUGGEST_SEND_LATER: ("warning", "🟣"),
 }
 
 
@@ -86,11 +88,11 @@ with tab_demo:
     st.subheader("Deterministic demo script")
     st.write(
         "Three judge beats (same as `python -m bob_naira_assist`). "
-        "Optional fourth: send-now (also in Playground)."
+        "Optional extras: send-now and send-later (also in Playground)."
     )
     st.info(
         "Click a beat below to evaluate. Order for judges: "
-        "**1 · Quiet** (no remittance) → **2 · Shortfall ping** → **3 · FX wait**. "
+        "**1 · Quiet** → **2 · Shortfall ping** → **3 · FX wait**. "
         "Quiet is never faked as a remittance decision."
     )
     if "judge_decision" not in st.session_state:
@@ -103,26 +105,41 @@ with tab_demo:
             st.session_state.judge_decision = decision
             st.session_state.judge_lines = lines
     with c2:
-        if st.button("2 · Shortfall ping", use_container_width=True, help="Buffer below bills → ping_shortfall"):
+        if st.button("2 · Shortfall ping", use_container_width=True, help="Buffer below bills → ping_shortfall (urgent bills named ≤3 days)"):
             lines, decision = run_alert_scenario()
             st.session_state.judge_decision = decision
             st.session_state.judge_lines = lines
     with c3:
-        if st.button("3 · FX wait", use_container_width=True, help="Buffer OK, FX spike + remittance → suggest_wait"):
+        if st.button("3 · FX wait", use_container_width=True, help="Buffer OK, FX spike ≥3%, remittance planned → suggest_wait"):
             lines, decision = run_fx_wait_scenario()
             st.session_state.judge_decision = decision
             st.session_state.judge_lines = lines
 
     st.divider()
-    if st.button("Optional · Send now", use_container_width=True, help="Buffer OK + stable FX + remittance → suggest_send_now"):
-        lines, decision = run_send_now_scenario()
-        st.session_state.judge_decision = decision
-        st.session_state.judge_lines = lines
+    co1, co2 = st.columns(2)
+    with co1:
+        if st.button("Optional · Send now", use_container_width=True, help="Buffer OK + stable FX + remittance → suggest_send_now"):
+            lines, decision = run_send_now_scenario()
+            st.session_state.judge_decision = decision
+            st.session_state.judge_lines = lines
+    with co2:
+        if st.button("Optional · Send later", use_container_width=True, help="Naira strengthening ≥3% + remittance planned → suggest_send_later"):
+            lines, decision = run_send_later_scenario()
+            st.session_state.judge_decision = decision
+            st.session_state.judge_lines = lines
 
     if st.session_state.judge_decision is None:
         st.caption("Empty state — pick a judge beat to see buffer, bills, and action.")
     else:
-        render_decision(st.session_state.judge_decision, st.session_state.judge_lines)
+        dec = st.session_state.judge_decision
+        render_decision(dec, st.session_state.judge_lines)
+        if dec.action == ActionKind.PING_SHORTFALL:
+            ub = urgent_bills(sample_bills())
+            if ub:
+                st.warning(
+                    "**Urgent bills (due ≤ 3 days):** "
+                    + ", ".join(f"{b.name} (₦{b.amount_ngn:,.0f}, {b.due_in_days}d)" for b in ub)
+                )
 
 with tab_play:
     st.subheader("Adjust buffer & FX")
@@ -133,7 +150,15 @@ with tab_play:
         st.text(format_bill_line(b))
 
     buffer_ngn = st.slider("NGN cash buffer", 100_000, 600_000, 400_000, 10_000)
-    fx_scenario = st.selectbox("Mock FX", ["stable", "watch", "spike"])
+    fx_scenario = st.selectbox(
+        "Mock FX scenario",
+        ["stable", "watch", "spike", "strengthen"],
+        help=(
+            "stable: mild move · watch: naira weaker ~2.5% · "
+            "spike: naira weaker 5% (suggest_wait with remittance) · "
+            "strengthen: naira stronger ≥3% (suggest_send_later with remittance)"
+        ),
+    )
     remit_usd = st.number_input("Planned remittance (USD)", min_value=0, value=0, step=50)
 
     if st.button("Evaluate", type="primary"):
@@ -144,6 +169,13 @@ with tab_play:
             remittance_planned_usd=float(remit_usd) if remit_usd else None,
         )
         render_decision(decision)
+        if decision.action == ActionKind.PING_SHORTFALL:
+            ub = urgent_bills(bills)
+            if ub:
+                st.warning(
+                    "**Urgent bills (due ≤ 3 days):** "
+                    + ", ".join(f"{b.name} (₦{b.amount_ngn:,.0f}, {b.due_in_days}d)" for b in ub)
+                )
         for d in decision.details:
             st.caption(d)
 
