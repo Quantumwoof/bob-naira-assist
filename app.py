@@ -183,7 +183,7 @@ with tab_about:
     st.markdown(
         """
 ### IBM Bob IDE as core component
-The initial offline scaffold was written before Bob access. After that, three real
+The initial offline scaffold was written before Bob access. After that, four real
 **IBM Bob IDE** tasks moved the product forward (exports in **bob_sessions/**):
 
 - **task-01 · architecture review** (0.216 Bobcoins) — read the whole repo, explained the
@@ -192,9 +192,11 @@ The initial offline scaffold was written before Bob access. After that, three re
   urgent bills, `0.0` remittance treated as none; 17 new tests → **36 passing**.
 - **task-03 · ship it to the UI** (1.89 Bobcoins) — Send-later button, Playground *strengthen*
   FX scenario, urgent-bills warning, `run_send_later_scenario` + tests → **40 passing**; README refresh.
-- **task-04 · fix FX economic logic** — corrected beat 3: naira-weakening spike is
+- **task-04 · fix FX economic logic** (2.20 Bobcoins) — corrected beat 3: naira-weakening spike is
   *favourable* for the USD sender (each $ buys more NGN), so the agent now advises
-  `suggest_send_now` (not the old incorrect `suggest_wait`).
+  `suggest_send_now` (not the old incorrect `suggest_wait`); 2 new tests → **42 passing**.
+
+About **5.3 of 40** hackathon Bobcoins used across the four tasks.
 
 See **AGENTS.md** for how to run further Bob tasks on this repo.
 

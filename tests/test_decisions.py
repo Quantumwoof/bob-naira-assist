@@ -126,7 +126,7 @@ def test_fx_spike_without_remittance_is_watch_not_send_now():
 
 
 def test_shortfall_beats_fx_spike_and_remittance():
-    """Cash shortfall wins over FX wait even when remittance + spike are set."""
+    """Cash shortfall wins over FX send-now even when remittance + spike are set."""
     bills = sample_bills()
     buffer = CashBuffer(280_000.0)
     d = evaluate_buffer(bills, buffer, DEMO_FX_SPIKE, remittance_planned_usd=500.0)

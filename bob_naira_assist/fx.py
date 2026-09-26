@@ -8,7 +8,7 @@ from bob_naira_assist.models import FxQuote
 DEMO_FX_STABLE = FxQuote(usd_ngn=1600.0, previous_usd_ngn=1595.0, as_of_label="demo-stable")
 # ~2.5% adverse — between FX_WATCH_PCT (2%) and FX_WAIT_PCT (3%).
 DEMO_FX_WATCH = FxQuote(usd_ngn=1640.0, previous_usd_ngn=1600.0, as_of_label="demo-watch")
-# 5% adverse — triggers suggest_wait when remittance is planned.
+# 5% naira weakening — favourable for a USD→NGN sender: triggers suggest_send_now when remittance is planned.
 DEMO_FX_SPIKE = FxQuote(usd_ngn=1680.0, previous_usd_ngn=1600.0, as_of_label="demo-spike")
 # ~3.1% naira strengthening — triggers suggest_send_later when remittance is planned.
 DEMO_FX_STRENGTHEN = FxQuote(usd_ngn=1550.0, previous_usd_ngn=1600.0, as_of_label="demo-strengthen")
@@ -20,7 +20,7 @@ def mock_quote(scenario: str = "stable") -> FxQuote:
     Scenarios:
     - stable: mild move (~0.3%), not adverse enough for FX watch
     - watch: ~2.5% naira weaker → ping_fx_watch (not wait)
-    - spike: 5% naira weaker → suggest_wait when remittance planned
+    - spike: 5% naira weaker → suggest_send_now (favourable rate) when remittance planned
     - strengthen: ~3.1% naira stronger → suggest_send_later when remittance planned
     """
     key = (scenario or "stable").strip().lower()

@@ -39,10 +39,11 @@ Banner confirms **DEMO_MODE is ON**.
 
 ## Minute 2:30 — Bob as core component
 
-Open `bob_sessions/README.md`. Show the three real Bob tasks: task-01 Bob reviewed the
+Open `bob_sessions/README.md`. Show the four real Bob tasks: task-01 Bob reviewed the
 architecture and found three decision-logic gaps; task-02 Bob fixed them with new tests;
-task-03 Bob wired the new `suggest_send_later` outcome into the Streamlit UI and refreshed docs.
-Show one consumption screenshot (about 3.1 Bobcoins used across all three).
+task-03 Bob wired the new `suggest_send_later` outcome into the Streamlit UI and refreshed docs;
+task-04 Bob fixed the backwards FX-wait logic (naira weakening now favours sending).
+Show one consumption screenshot (about 5.3 Bobcoins used across all four).
 
 ## Minute 3:00 — Links
 

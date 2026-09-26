@@ -1,7 +1,7 @@
 # Architecture
 
 BobNairaAssist keeps the agent story small and testable: pure Python decisions + Streamlit UI,
-with IBM Bob IDE as the build partner (three real session exports in `bob_sessions/`).
+with IBM Bob IDE as the build partner (four real session exports in `bob_sessions/`).
 
 ## Mermaid overview
 
@@ -22,7 +22,6 @@ flowchart LR
     Quiet[quiet]
     Shortfall[ping_shortfall]
     FxWatch[ping_fx_watch]
-    Wait[suggest_wait]
     Send[suggest_send_now]
     SendLater[suggest_send_later]
     UI[Streamlit app.py]
@@ -35,7 +34,6 @@ flowchart LR
   Eval --> Quiet
   Eval --> Shortfall
   Eval --> FxWatch
-  Eval --> Wait
   Eval --> Send
   Eval --> SendLater
   Agent --> CLI

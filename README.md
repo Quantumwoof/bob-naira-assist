@@ -14,11 +14,11 @@ IBM Bob 2.0 LabLab hackathon · team **BobNairaAssist** · builder **Joshua Jube
 
 | Status | Item |
 |--------|------|
-| **Works offline now** | `DEMO_MODE` CLI, Streamlit UI, pytest — 6 decision outcomes, bill-horizon filter, urgent-bill naming |
-| **6 decision outcomes** | `quiet` · `ping_shortfall` (names urgent bills ≤3 days) · `ping_fx_watch` · `suggest_send_now` · `suggest_send_later` (naira strengthening ≥3%) · `suggest_wait` (deprecated; kept for Streamlit style map only) |
+| **Works offline now** | `DEMO_MODE` CLI, Streamlit UI, pytest (42 tests) — 5 active decision outcomes, bill-horizon filter, urgent-bill naming |
+| **Decision outcomes** | `quiet` · `ping_shortfall` (names urgent bills ≤3 days) · `ping_fx_watch` · `suggest_send_now` · `suggest_send_later` (naira strengthening ≥3%) · `suggest_wait` (deprecated; kept for Streamlit style map only) |
 | **Bill-horizon / urgent bills** | `total_due` accepts `horizon_days`; shortfall message names bills due ≤3 days; Streamlit shows them in a warning box |
 | **CI workflow** | `.github/workflows/ci.yml` ready locally (pytest on 3.11/3.12); push blocked until `gh` token has `workflow` scope |
-| **Bob IDE sessions** | `bob_sessions/` holds real exported session reports (task-01 architecture review, task-02 decision fixes, task-03 UI & docs) |
+| **Bob IDE sessions** | `bob_sessions/` holds real exported session reports (task-01 architecture review, task-02 decision fixes, task-03 UI & docs, task-04 FX sender-view fix) |
 | **Live demo** | [`index.html`](index.html) serves the same `app.py` on GitHub Pages via [stlite](https://github.com/whitphx/stlite) (Pyodide), with no server and no keys |
 | **Not required for demo** | watsonx / cloud LLM / live bank or FX APIs |
 
@@ -28,11 +28,11 @@ IBM Bob 2.0 LabLab hackathon · team **BobNairaAssist** · builder **Joshua Jube
 
 **Pain:** Constant rate and bill noise. People either over-check FX or miss a shortfall until DSTV or fuel is due.
 
-**Why an agent:** Stay **quiet** when the NGN buffer covers bills and FX is calm; **ping** on shortfall or adverse FX; suggest **wait vs send now** for a planned remittance. Small, explainable tools — not a black-box chatbot.
+**Why an agent:** Stay **quiet** when the NGN buffer covers bills and FX is calm; **ping** on shortfall or adverse FX; suggest **send now vs send later** for a planned remittance, from the sender's point of view. Small, explainable tools — not a black-box chatbot.
 
 ## Judge demo beats (honest)
 
-CLI / Streamlit **Judge demo** runs three deterministic beats, plus two optional extras (the sixth outcome, `ping_fx_watch`, is reachable in the Playground with the `watch` FX scenario):
+CLI / Streamlit **Judge demo** runs three deterministic beats, plus two optional extras (the fifth active outcome, `ping_fx_watch`, is reachable in the Playground with the `watch` FX scenario):
 
 1. **Quiet** — buffer covers bills, stable FX, **no** remittance planned → `quiet`
 2. **Shortfall ping** — buffer below bills → `ping_shortfall`; urgent bills due ≤3 days are named in the message and surfaced in the Streamlit warning box
@@ -58,7 +58,7 @@ flowchart LR
   subgraph outs [Outputs]
     Quiet[Quiet]
     Ping[Ping]
-    Timing[Wait / send now]
+    Timing[Send now / send later]
     UI[Streamlit]
     CLI[CLI demo]
   end
@@ -104,14 +104,14 @@ Hackathon judging expects **IBM Bob IDE as a core component**. This repo is stru
 | Artifact | Purpose |
 |----------|---------|
 | [`AGENTS.md`](AGENTS.md) | How to run intentional multi-step Bob tasks on this codebase |
-| [`docs/bob-workflow.md`](docs/bob-workflow.md) | The Bob workflow as it actually ran (3 tasks) + next candidate tasks |
-| [`bob_sessions/`](bob_sessions/) | Exported Bob IDE task reports + consumption screenshots (3 sessions) |
+| [`docs/bob-workflow.md`](docs/bob-workflow.md) | The Bob workflow as it actually ran (4 tasks) + next candidate tasks |
+| [`bob_sessions/`](bob_sessions/) | Exported Bob IDE task reports + consumption screenshots (4 sessions) |
 
-**Access:** Hackathon Enterprise instance (40 Bobcoin budget). The three sessions used about 3.1 Bobcoins in total (0.216 + 1.01 + 1.89, per the consumption screenshots). Build window **Sep 25–27 2026**.
+**Access:** Hackathon Enterprise instance (40 Bobcoin budget). The four sessions used about 5.3 Bobcoins in total (0.216 + 1.01 + 1.89 + 2.20, per the consumption screenshots). Build window **Sep 25–27 2026**.
 
 ### Honest status
 
-Three real Bob IDE session exports are in `bob_sessions/`: task-01 (architecture review), task-02 (decision-logic fixes), task-03 (UI wiring + docs). Each includes a markdown report and a screenshot.
+Four real Bob IDE session exports are in `bob_sessions/`: task-01 (architecture review), task-02 (decision-logic fixes), task-03 (UI wiring + docs), task-04 (FX sender-view fix: a sharp naira weakening now suggests sending, not waiting). Each includes a markdown report and a screenshot.
 
 watsonx is optional later and is **not** required for the offline demo.
 

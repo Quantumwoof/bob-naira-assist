@@ -38,7 +38,7 @@ After each real Bob session: export the task report + screenshots into `bob_sess
 
 ```bash
 export DEMO_MODE=1
-python -m bob_naira_assist          # quiet → shortfall → FX wait (judge beats)
+python -m bob_naira_assist          # quiet → shortfall → FX spike → send now (judge beats)
 pytest -q
 streamlit run app.py
 ```
